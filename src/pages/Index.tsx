@@ -8,6 +8,9 @@ import AlertsPage from "@/pages/AlertsPage";
 import DiseaseDetailPage from "@/pages/DiseaseDetailPage";
 import { Button } from "@/components/ui/button";
 import { Sun, Moon } from "lucide-react";
+import { AlertProvider } from "@/contexts/AlertContext";
+import { SavedProvider } from "@/contexts/SavedContext";
+import { Toaster } from "@/components/ui/sonner";
 
 const Index = () => {
   const [currentPage, setCurrentPage] = useState("home");
@@ -112,15 +115,20 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="flex">
-        <Navigation currentPage={currentPage} onPageChange={handleNavigate} />
-        
-        <main className="flex-1 pb-20 md:pb-0">
-          {renderPage()}
-        </main>
-      </div>
-    </div>
+    <AlertProvider>
+      <SavedProvider>
+        <div className="min-h-screen bg-background">
+          <div className="flex">
+            <Navigation currentPage={currentPage} onPageChange={handleNavigate} />
+            
+            <main className="flex-1 pb-20 md:pb-0">
+              {renderPage()}
+            </main>
+          </div>
+          <Toaster />
+        </div>
+      </SavedProvider>
+    </AlertProvider>
   );
 };
 

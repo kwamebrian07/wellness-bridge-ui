@@ -1,23 +1,18 @@
-import { useState, useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { DiseaseCard } from "@/components/DiseaseCard";
 import { Button } from "@/components/ui/button";
 import { Bookmark, Heart } from "lucide-react";
 import { getBasicDiseases } from "@/data/diseases";
 import { toast } from "sonner";
+import { useSaved } from "@/contexts/SavedContext";
 
 interface SavedPageProps {
   onNavigate: (page: string, params?: any) => void;
 }
 
 export const SavedPage = ({ onNavigate }: SavedPageProps) => {
-  const [savedDiseases, setSavedDiseases] = useState<string[]>([]);
+  const { savedDiseases, toggleSave } = useSaved();
   const allDiseases = getBasicDiseases();
-
-  // Load saved diseases from localStorage
-  useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('savedDiseases') || '[]');
-    setSavedDiseases(saved);
-  }, []);
 
   // Filter to show only saved diseases
   const savedDiseasesData = useMemo(() => {
@@ -29,10 +24,7 @@ export const SavedPage = ({ onNavigate }: SavedPageProps) => {
   };
 
   const handleRemoveFromSaved = (diseaseId: string) => {
-    const newSavedDiseases = savedDiseases.filter(id => id !== diseaseId);
-    setSavedDiseases(newSavedDiseases);
-    localStorage.setItem('savedDiseases', JSON.stringify(newSavedDiseases));
-    
+    toggleSave(diseaseId);
     const disease = allDiseases.find(d => d.id === diseaseId);
     toast.success(`${disease?.name} removed from saved`);
   };

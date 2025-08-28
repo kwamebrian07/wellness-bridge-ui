@@ -1,72 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Bell, X, Clock, MapPin, AlertTriangle, Info, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
-
-interface Alert {
-  id: string;
-  type: "emergency" | "warning" | "info" | "health-tip";
-  title: string;
-  message: string;
-  location?: string;
-  timestamp: string;
-  isRead: boolean;
-  priority: "high" | "medium" | "low";
-}
-
-const sampleAlerts: Alert[] = [
-  {
-    id: "1",
-    type: "emergency",
-    title: "Cholera Outbreak Alert",
-    message: "A cholera outbreak has been reported in Greater Accra. Ensure you drink only bottled or properly boiled water. Seek immediate medical attention if you experience severe diarrhea or vomiting.",
-    location: "Greater Accra Region",
-    timestamp: "2024-01-15T10:30:00Z",
-    isRead: false,
-    priority: "high"
-  },
-  {
-    id: "2",
-    type: "warning",
-    title: "Malaria Prevention Reminder",
-    message: "The rainy season has increased mosquito activity. Remember to sleep under treated nets and eliminate standing water around your home.",
-    location: "Nationwide",
-    timestamp: "2024-01-14T18:00:00Z",
-    isRead: false,
-    priority: "medium"
-  },
-  {
-    id: "3",
-    type: "info",
-    title: "Free Health Screening",
-    message: "Free blood pressure and diabetes screening available at Korle-Bu Teaching Hospital this weekend from 8 AM to 4 PM.",
-    location: "Korle-Bu Teaching Hospital",
-    timestamp: "2024-01-13T09:00:00Z",
-    isRead: true,
-    priority: "low"
-  },
-  {
-    id: "4",
-    type: "health-tip",
-    title: "Daily Health Tip",
-    message: "Drink at least 8 glasses of water daily to maintain proper hydration and support kidney function.",
-    timestamp: "2024-01-12T06:00:00Z",
-    isRead: true,
-    priority: "low"
-  },
-  {
-    id: "5",
-    type: "warning",
-    title: "Heat Wave Warning",
-    message: "Extreme heat expected this week. Stay hydrated, avoid direct sunlight during peak hours (11 AM - 3 PM), and wear light-colored clothing.",
-    location: "Northern Regions",
-    timestamp: "2024-01-11T14:00:00Z",
-    isRead: false,
-    priority: "medium"
-  }
-];
+import { useAlerts } from "@/contexts/AlertContext";
 
 const alertConfig = {
   emergency: {
@@ -96,7 +34,7 @@ interface AlertsPageProps {
 }
 
 export const AlertsPage = ({ onNavigate }: AlertsPageProps) => {
-  const [alerts, setAlerts] = useState<Alert[]>(sampleAlerts);
+  const { alerts, unreadCount, markAsRead, markAllAsRead, deleteAlert } = useAlerts();
   const [filter, setFilter] = useState<"all" | "unread" | "emergency">("all");
 
   const filteredAlerts = alerts.filter(alert => {
@@ -105,21 +43,13 @@ export const AlertsPage = ({ onNavigate }: AlertsPageProps) => {
     return true;
   });
 
-  const unreadCount = alerts.filter(alert => !alert.isRead).length;
-
-  const markAsRead = (alertId: string) => {
-    setAlerts(prev => prev.map(alert => 
-      alert.id === alertId ? { ...alert, isRead: true } : alert
-    ));
-  };
-
-  const markAllAsRead = () => {
-    setAlerts(prev => prev.map(alert => ({ ...alert, isRead: true })));
+  const handleMarkAllAsRead = () => {
+    markAllAsRead();
     toast.success("All alerts marked as read");
   };
 
-  const deleteAlert = (alertId: string) => {
-    setAlerts(prev => prev.filter(alert => alert.id !== alertId));
+  const handleDeleteAlert = (alertId: string) => {
+    deleteAlert(alertId);
     toast.success("Alert deleted");
   };
 
@@ -145,15 +75,15 @@ export const AlertsPage = ({ onNavigate }: AlertsPageProps) => {
               Stay updated with important health notifications
             </p>
           </div>
-          {unreadCount > 0 && (
-            <Button 
-              variant="outline" 
-              onClick={markAllAsRead}
-              className="hidden sm:flex"
-            >
-              Mark all as read ({unreadCount})
-            </Button>
-          )}
+           {unreadCount > 0 && (
+             <Button 
+               variant="outline" 
+               onClick={handleMarkAllAsRead}
+               className="hidden sm:flex"
+             >
+               Mark all as read ({unreadCount})
+             </Button>
+           )}
         </div>
 
         {/* Filter Buttons */}
@@ -179,16 +109,16 @@ export const AlertsPage = ({ onNavigate }: AlertsPageProps) => {
 
         {/* Mobile Mark All Read */}
         {unreadCount > 0 && (
-          <div className="sm:hidden mb-4">
-            <Button 
-              variant="outline" 
-              onClick={markAllAsRead}
-              size="sm"
-              className="w-full"
-            >
-              Mark all as read ({unreadCount})
-            </Button>
-          </div>
+           <div className="sm:hidden mb-4">
+             <Button 
+               variant="outline" 
+               onClick={handleMarkAllAsRead}
+               size="sm"
+               className="w-full"
+             >
+               Mark all as read ({unreadCount})
+             </Button>
+           </div>
         )}
 
         {/* Alerts List */}
@@ -223,14 +153,14 @@ export const AlertsPage = ({ onNavigate }: AlertsPageProps) => {
                               </Badge>
                             )}
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => deleteAlert(alert.id)}
-                            className="opacity-60 hover:opacity-100"
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
+                           <Button
+                             variant="ghost"
+                             size="sm"
+                             onClick={() => handleDeleteAlert(alert.id)}
+                             className="opacity-60 hover:opacity-100"
+                           >
+                             <X className="w-4 h-4" />
+                           </Button>
                         </div>
                         
                         <p className="text-muted-foreground mb-3 leading-relaxed">

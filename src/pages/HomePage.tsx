@@ -4,6 +4,8 @@ import { DiseaseCard } from "@/components/DiseaseCard";
 import { Button } from "@/components/ui/button";
 import { Heart, Activity, Shield, MessageCircle, Phone, ChevronRight } from "lucide-react";
 import healthHero from "@/assets/health-hero.jpg";
+import { useSaved } from "@/contexts/SavedContext";
+import { toast } from "sonner";
 
 const quickAccessDiseases = [
   {
@@ -78,6 +80,7 @@ interface HomePageProps {
 
 export const HomePage = ({ onNavigate, language }: HomePageProps) => {
   const [searchValue, setSearchValue] = useState("");
+  const { isSaved, toggleSave } = useSaved();
 
   const handleSearch = (value: string) => {
     if (value.trim()) {
@@ -94,8 +97,10 @@ export const HomePage = ({ onNavigate, language }: HomePageProps) => {
   };
 
   const handleSaveDisease = (diseaseId: string) => {
-    // In a real app, this would update the saved state
-    console.log(`Toggling save for disease: ${diseaseId}`);
+    toggleSave(diseaseId);
+    const isNowSaved = !isSaved(diseaseId);
+    const diseaseName = quickAccessDiseases.find(d => d.id === diseaseId)?.name || "Disease";
+    toast.success(isNowSaved ? `${diseaseName} saved` : `${diseaseName} removed from saved`);
   };
 
   return (
@@ -176,17 +181,17 @@ export const HomePage = ({ onNavigate, language }: HomePageProps) => {
             </Button>
           </div>
           
-          <div className="grid sm:grid-cols-2 gap-4">
-            {quickAccessDiseases.slice(0, 2).map((disease) => (
-              <DiseaseCard
-                key={disease.id}
-                disease={disease}
-                variant="featured"
-                onClick={() => handleDiseaseClick(disease.id)}
-                onSave={() => handleSaveDisease(disease.id)}
-              />
-            ))}
-          </div>
+           <div className="grid sm:grid-cols-2 gap-4">
+             {quickAccessDiseases.slice(0, 2).map((disease) => (
+               <DiseaseCard
+                 key={disease.id}
+                 disease={{...disease, isSaved: isSaved(disease.id)}}
+                 variant="featured"
+                 onClick={() => handleDiseaseClick(disease.id)}
+                 onSave={() => handleSaveDisease(disease.id)}
+               />
+             ))}
+           </div>
         </section>
 
         {/* Categories */}

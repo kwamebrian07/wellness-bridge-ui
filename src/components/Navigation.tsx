@@ -1,5 +1,5 @@
 import { Home, Search, Bookmark, Bell, Settings } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useAlerts } from "@/contexts/AlertContext";
 
 interface NavigationProps {
   currentPage: string;
@@ -15,18 +15,7 @@ const navItems = [
 ];
 
 export const Navigation = ({ currentPage, onPageChange }: NavigationProps) => {
-  const [alertCount, setAlertCount] = useState(0);
-
-  // Get unread alerts count
-  useEffect(() => {
-    // Sample alerts data - in a real app this would come from an API or store
-    const sampleAlerts = [
-      { id: "1", isRead: false },
-      { id: "2", isRead: false },
-      { id: "5", isRead: false }
-    ];
-    setAlertCount(sampleAlerts.filter(alert => !alert.isRead).length);
-  }, []);
+  const { unreadCount } = useAlerts();
 
   return (
     <>
@@ -51,14 +40,14 @@ export const Navigation = ({ currentPage, onPageChange }: NavigationProps) => {
                     : "text-text-muted hover:bg-muted hover:text-foreground"
                 }`}
               >
-                <div className="relative">
-                  <Icon className="w-5 h-5" />
-                  {item.id === "alerts" && alertCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                      {alertCount > 9 ? "9+" : alertCount}
-                    </span>
-                  )}
-                </div>
+                 <div className="relative">
+                   <Icon className="w-5 h-5" />
+                   {item.id === "alerts" && unreadCount > 0 && (
+                     <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                       {unreadCount > 9 ? "9+" : unreadCount}
+                     </span>
+                   )}
+                 </div>
                 <span className="font-medium">{item.label}</span>
               </button>
             );
@@ -85,14 +74,14 @@ export const Navigation = ({ currentPage, onPageChange }: NavigationProps) => {
                     : "text-text-muted"
                 }`}
                 >
-                <div className="relative">
-                  <Icon className="w-5 h-5" />
-                  {item.id === "alerts" && alertCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                      {alertCount > 9 ? "9+" : alertCount}
-                    </span>
-                  )}
-                </div>
+                 <div className="relative">
+                   <Icon className="w-5 h-5" />
+                   {item.id === "alerts" && unreadCount > 0 && (
+                     <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                       {unreadCount > 9 ? "9+" : unreadCount}
+                     </span>
+                   )}
+                 </div>
                 <span className="text-xs font-medium">{item.label}</span>
               </button>
             );

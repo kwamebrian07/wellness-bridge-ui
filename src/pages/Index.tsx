@@ -3,6 +3,8 @@ import { Navigation } from "@/components/Navigation";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { HomePage } from "@/pages/HomePage";
 import { BrowsePage } from "@/pages/BrowsePage";
+import SavedPage from "@/pages/SavedPage";
+import AlertsPage from "@/pages/AlertsPage";
 import DiseaseDetailPage from "@/pages/DiseaseDetailPage";
 import { Button } from "@/components/ui/button";
 import { Sun, Moon } from "lucide-react";
@@ -36,23 +38,9 @@ const Index = () => {
           />
         );
       case "saved":
-        return (
-          <div className="min-h-screen bg-background flex items-center justify-center">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-foreground mb-4">Saved Diseases</h2>
-              <p className="text-text-muted">Your saved content will appear here</p>
-            </div>
-          </div>
-        );
+        return <SavedPage onNavigate={handleNavigate} />;
       case "alerts":
-        return (
-          <div className="min-h-screen bg-background flex items-center justify-center">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-foreground mb-4">Health Alerts</h2>
-              <p className="text-text-muted">Health alerts and updates will appear here</p>
-            </div>
-          </div>
-        );
+        return <AlertsPage onNavigate={handleNavigate} />;
       case "settings":
         return (
           <div className="min-h-screen bg-background">

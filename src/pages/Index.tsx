@@ -3,6 +3,7 @@ import { Navigation } from "@/components/Navigation";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { HomePage } from "@/pages/HomePage";
 import { BrowsePage } from "@/pages/BrowsePage";
+import DiseaseDetailPage from "@/pages/DiseaseDetailPage";
 import { Button } from "@/components/ui/button";
 import { Sun, Moon } from "lucide-react";
 
@@ -111,19 +112,11 @@ const Index = () => {
         );
       case "disease-detail":
         return (
-          <div className="min-h-screen bg-background flex items-center justify-center">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-foreground mb-4">Disease Details</h2>
-              <p className="text-text-muted">Detailed information about {pageParams.id} will appear here</p>
-              <Button 
-                variant="outline" 
-                onClick={() => handleNavigate("browse")}
-                className="mt-4"
-              >
-                Back to Browse
-              </Button>
-            </div>
-          </div>
+          <DiseaseDetailPage 
+            diseaseId={pageParams.id} 
+            onNavigate={handleNavigate}
+            currentLanguage={currentLanguage}
+          />
         );
       default:
         return <HomePage onNavigate={handleNavigate} language={currentLanguage} />;

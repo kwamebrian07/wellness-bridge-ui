@@ -3,89 +3,10 @@ import { SearchBar } from "@/components/SearchBar";
 import { DiseaseCard } from "@/components/DiseaseCard";
 import { Button } from "@/components/ui/button";
 import { Filter, Grid, List } from "lucide-react";
+import { getBasicDiseases } from "@/data/diseases";
 
-const allDiseases = [
-  {
-    id: "hiv-aids",
-    name: "HIV/AIDS",
-    category: "communicable" as const,
-    description: "Understanding HIV transmission, prevention, and living with HIV. Comprehensive guide covering symptoms, testing, treatment options, and support resources.",
-    lastUpdated: "2 days ago",
-    isOfflineAvailable: true,
-    isSaved: false,
-    severity: "high" as const
-  },
-  {
-    id: "hypertension",
-    name: "Hypertension",
-    category: "non-communicable" as const,
-    description: "High blood pressure management and prevention strategies. Learn about risk factors, lifestyle changes, medications, and monitoring techniques.",
-    lastUpdated: "1 day ago",
-    isOfflineAvailable: true,
-    isSaved: true,
-    severity: "medium" as const
-  },
-  {
-    id: "malaria",
-    name: "Malaria",
-    category: "communicable" as const,
-    description: "Prevention, symptoms, and treatment of malaria. Essential information for prevention, recognizing symptoms, and seeking timely treatment.",
-    lastUpdated: "3 days ago",
-    isOfflineAvailable: true,
-    isSaved: false,
-    severity: "high" as const
-  },
-  {
-    id: "diabetes",
-    name: "Diabetes",
-    category: "non-communicable" as const,
-    description: "Type 1 and Type 2 diabetes management and care. Comprehensive guide to blood sugar monitoring, diet management, and long-term care.",
-    lastUpdated: "1 week ago",
-    isOfflineAvailable: false,
-    isSaved: false,
-    severity: "medium" as const
-  },
-  {
-    id: "tuberculosis",
-    name: "Tuberculosis",
-    category: "communicable" as const,
-    description: "TB prevention, diagnosis, and treatment protocols. Understanding drug-resistant TB and the importance of completing treatment courses.",
-    lastUpdated: "5 days ago",
-    isOfflineAvailable: true,
-    isSaved: false,
-    severity: "high" as const
-  },
-  {
-    id: "heart-disease",
-    name: "Heart Disease",
-    category: "non-communicable" as const,
-    description: "Cardiovascular health, prevention, and management. Learn about heart attack symptoms, prevention strategies, and cardiac rehabilitation.",
-    lastUpdated: "4 days ago",
-    isOfflineAvailable: false,
-    isSaved: true,
-    severity: "high" as const
-  },
-  {
-    id: "stroke",
-    name: "Stroke",
-    category: "emergency" as const,
-    description: "Recognizing stroke symptoms and emergency response. Critical information about FAST signs, emergency treatment, and rehabilitation.",
-    lastUpdated: "2 days ago",
-    isOfflineAvailable: true,
-    isSaved: false,
-    severity: "high" as const
-  },
-  {
-    id: "cholera",
-    name: "Cholera",
-    category: "communicable" as const,
-    description: "Cholera prevention and emergency treatment. Water safety, sanitation practices, and recognizing dehydration symptoms.",
-    lastUpdated: "1 week ago",
-    isOfflineAvailable: true,
-    isSaved: false,
-    severity: "high" as const
-  }
-];
+// Get diseases from the centralized data source
+const allDiseases = getBasicDiseases();
 
 const filterOptions = [
   { id: "all", label: "All Diseases" },
@@ -145,7 +66,7 @@ export const BrowsePage = ({ onNavigate, initialQuery = "", initialCategory = "a
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Browse Health Topics</h1>
-          <p className="text-text-muted">
+          <p className="text-muted-foreground">
             Explore our comprehensive database of health information
           </p>
         </div>
@@ -166,10 +87,10 @@ export const BrowsePage = ({ onNavigate, initialQuery = "", initialCategory = "a
               <button
                 key={option.id}
                 onClick={() => setSelectedFilter(option.id)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-smooth ${
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   selectedFilter === option.id
-                    ? "bg-primary text-primary-foreground shadow-soft"
-                    : "bg-muted text-text-muted hover:bg-muted/80 hover:text-foreground"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
                 }`}
               >
                 {option.label}
@@ -178,7 +99,7 @@ export const BrowsePage = ({ onNavigate, initialQuery = "", initialCategory = "a
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-sm text-text-muted mr-2">View:</span>
+            <span className="text-sm text-muted-foreground mr-2">View:</span>
             <Button
               variant={viewMode === "grid" ? "default" : "ghost"}
               size="sm"
@@ -198,7 +119,7 @@ export const BrowsePage = ({ onNavigate, initialQuery = "", initialCategory = "a
 
         {/* Results */}
         <div className="mb-6">
-          <p className="text-sm text-text-muted">
+          <p className="text-sm text-muted-foreground">
             {filteredDiseases.length} {filteredDiseases.length === 1 ? "result" : "results"} found
             {selectedFilter !== "all" && ` in ${filterOptions.find(f => f.id === selectedFilter)?.label.toLowerCase()}`}
           </p>
@@ -224,10 +145,10 @@ export const BrowsePage = ({ onNavigate, initialQuery = "", initialCategory = "a
         ) : (
           <div className="text-center py-16">
             <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
-              <Filter className="w-8 h-8 text-text-muted" />
+              <Filter className="w-8 h-8 text-muted-foreground" />
             </div>
             <h3 className="text-xl font-semibold text-foreground mb-2">No results found</h3>
-            <p className="text-text-muted mb-6 max-w-md mx-auto">
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
               {searchQuery 
                 ? `No diseases match "${searchQuery}". Try different keywords or browse by category.`
                 : "No diseases match your current filters. Try adjusting your selection."
@@ -248,3 +169,5 @@ export const BrowsePage = ({ onNavigate, initialQuery = "", initialCategory = "a
     </div>
   );
 };
+
+export default BrowsePage;

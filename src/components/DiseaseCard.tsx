@@ -1,8 +1,11 @@
 import { Heart, Activity, Shield, Users, Clock, Bookmark, BookmarkCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+import type { DetailedDisease } from "@/data/diseases";
+
 export type DiseaseCategory = "communicable" | "non-communicable" | "emergency";
 
+// Use the basic disease interface for cards
 interface Disease {
   id: string;
   name: string;

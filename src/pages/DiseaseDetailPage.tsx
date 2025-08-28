@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, Clock, User, Bookmark, BookmarkCheck, Share2, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { getDiseaseById } from "@/data/diseases";
 import type { DiseaseContent } from "@/data/diseases";
+import { toast } from "sonner";
 
 interface DiseaseDetailPageProps {
   diseaseId: string;
@@ -43,6 +44,12 @@ export default function DiseaseDetailPage({ diseaseId, onNavigate, currentLangua
   const [isReading, setIsReading] = useState(false);
   
   const disease = getDiseaseById(diseaseId);
+
+  // Initialize saved state from localStorage
+  useEffect(() => {
+    const savedDiseases = JSON.parse(localStorage.getItem('savedDiseases') || '[]');
+    setIsSaved(savedDiseases.includes(diseaseId));
+  }, [diseaseId]);
   
   if (!disease) {
     return (
@@ -63,8 +70,24 @@ export default function DiseaseDetailPage({ diseaseId, onNavigate, currentLangua
   const categoryInfo = categoryConfig[disease.category];
 
   const handleSave = () => {
-    setIsSaved(!isSaved);
-    // TODO: Implement actual save functionality
+    const savedDiseases = JSON.parse(localStorage.getItem('savedDiseases') || '[]');
+    const newSavedState = !isSaved;
+    
+    if (newSavedState) {
+      if (!savedDiseases.includes(diseaseId)) {
+        savedDiseases.push(diseaseId);
+        toast.success(`${disease?.name} saved for offline reading`);
+      }
+    } else {
+      const index = savedDiseases.indexOf(diseaseId);
+      if (index > -1) {
+        savedDiseases.splice(index, 1);
+        toast.success(`${disease?.name} removed from saved`);
+      }
+    }
+    
+    localStorage.setItem('savedDiseases', JSON.stringify(savedDiseases));
+    setIsSaved(newSavedState);
   };
 
   const handleShare = async () => {
@@ -81,7 +104,7 @@ export default function DiseaseDetailPage({ diseaseId, onNavigate, currentLangua
     } else {
       // Fallback: copy to clipboard
       navigator.clipboard.writeText(window.location.href);
-      // TODO: Show toast notification
+      toast.success("Link copied to clipboard");
     }
   };
 

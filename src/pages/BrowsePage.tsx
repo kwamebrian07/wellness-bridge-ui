@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { SearchBar } from "@/components/SearchBar";
 import { DiseaseCard } from "@/components/DiseaseCard";
 import { Button } from "@/components/ui/button";
 import { Filter, Grid, List } from "lucide-react";
-import { getBasicDiseases } from "@/data/diseases";
+import { getBasicDiseases, diseaseDatabase } from "@/data/diseases";
+import { toast } from "sonner";
 
 // Get diseases from the centralized data source
 const allDiseases = getBasicDiseases();
@@ -27,21 +28,55 @@ export const BrowsePage = ({ onNavigate, initialQuery = "", initialCategory = "a
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [selectedFilter, setSelectedFilter] = useState(initialCategory);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [savedDiseases, setSavedDiseases] = useState<string[]>([]);
+
+  // Load saved diseases from localStorage
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem('savedDiseases') || '[]');
+    setSavedDiseases(saved);
+  }, []);
 
   const filteredDiseases = useMemo(() => {
     let filtered = [...allDiseases];
 
-    // Apply search filter
+    // Apply search filter - now searches through comprehensive content
     if (searchQuery.trim()) {
-      filtered = filtered.filter(disease =>
-        disease.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        disease.description.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(disease => {
+        // Search in basic disease info
+        const basicMatch = disease.name.toLowerCase().includes(query) ||
+                          disease.description.toLowerCase().includes(query);
+        
+        // Search in detailed content
+        const detailedDisease = diseaseDatabase.find(d => d.id === disease.id);
+        if (!detailedDisease) return basicMatch;
+        
+        const content = detailedDisease.content.en;
+        const detailedMatch = content.overview.toLowerCase().includes(query) ||
+                             content.symptoms.some(s => s.toLowerCase().includes(query)) ||
+                             content.causes.some(c => c.toLowerCase().includes(query)) ||
+                             content.prevention.some(p => p.toLowerCase().includes(query)) ||
+                             content.treatment.some(t => t.toLowerCase().includes(query)) ||
+                             (content.complications?.some(c => c.toLowerCase().includes(query)) || false) ||
+                             (content.riskFactors?.some(r => r.toLowerCase().includes(query)) || false) ||
+                             (content.diagnosis?.some(d => d.toLowerCase().includes(query)) || false) ||
+                             (content.livingWith?.some(l => l.toLowerCase().includes(query)) || false) ||
+                             content.faqs.some(faq => 
+                               faq.question.toLowerCase().includes(query) || 
+                               faq.answer.toLowerCase().includes(query)
+                             ) ||
+                             content.resources.some(r => 
+                               r.title.toLowerCase().includes(query) || 
+                               r.description.toLowerCase().includes(query)
+                             );
+        
+        return basicMatch || detailedMatch;
+      });
     }
 
     // Apply category filter
     if (selectedFilter === "saved") {
-      filtered = filtered.filter(disease => disease.isSaved);
+      filtered = filtered.filter(disease => savedDiseases.includes(disease.id));
     } else if (selectedFilter === "offline") {
       filtered = filtered.filter(disease => disease.isOfflineAvailable);
     } else if (selectedFilter !== "all") {
@@ -49,15 +84,23 @@ export const BrowsePage = ({ onNavigate, initialQuery = "", initialCategory = "a
     }
 
     return filtered;
-  }, [searchQuery, selectedFilter]);
+  }, [searchQuery, selectedFilter, savedDiseases]);
 
   const handleDiseaseClick = (diseaseId: string) => {
     onNavigate("disease-detail", { id: diseaseId });
   };
 
   const handleSaveDisease = (diseaseId: string) => {
-    // In a real app, this would update the saved state
-    console.log(`Toggling save for disease: ${diseaseId}`);
+    const newSavedDiseases = savedDiseases.includes(diseaseId)
+      ? savedDiseases.filter(id => id !== diseaseId)
+      : [...savedDiseases, diseaseId];
+    
+    setSavedDiseases(newSavedDiseases);
+    localStorage.setItem('savedDiseases', JSON.stringify(newSavedDiseases));
+    
+    const disease = allDiseases.find(d => d.id === diseaseId);
+    const action = newSavedDiseases.includes(diseaseId) ? "saved" : "removed from saved";
+    toast.success(`${disease?.name} ${action}`);
   };
 
   return (
@@ -135,7 +178,7 @@ export const BrowsePage = ({ onNavigate, initialQuery = "", initialCategory = "a
             {filteredDiseases.map((disease) => (
               <DiseaseCard
                 key={disease.id}
-                disease={disease}
+                disease={{...disease, isSaved: savedDiseases.includes(disease.id)}}
                 variant={viewMode === "grid" ? "default" : "compact"}
                 onClick={() => handleDiseaseClick(disease.id)}
                 onSave={() => handleSaveDisease(disease.id)}

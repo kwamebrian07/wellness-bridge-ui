@@ -1,11 +1,143 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { Navigation } from "@/components/Navigation";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { HomePage } from "@/pages/HomePage";
+import { BrowsePage } from "@/pages/BrowsePage";
+import { Button } from "@/components/ui/button";
+import { Sun, Moon } from "lucide-react";
 
 const Index = () => {
+  const [currentPage, setCurrentPage] = useState("home");
+  const [currentLanguage, setCurrentLanguage] = useState("en");
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [pageParams, setPageParams] = useState<any>({});
+
+  const handleNavigate = (page: string, params?: any) => {
+    setCurrentPage(page);
+    setPageParams(params || {});
+  };
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+    document.documentElement.classList.toggle("dark");
+  };
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case "home":
+        return <HomePage onNavigate={handleNavigate} language={currentLanguage} />;
+      case "browse":
+        return (
+          <BrowsePage 
+            onNavigate={handleNavigate}
+            initialQuery={pageParams.query}
+            initialCategory={pageParams.category}
+          />
+        );
+      case "saved":
+        return (
+          <div className="min-h-screen bg-background flex items-center justify-center">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-foreground mb-4">Saved Diseases</h2>
+              <p className="text-text-muted">Your saved content will appear here</p>
+            </div>
+          </div>
+        );
+      case "alerts":
+        return (
+          <div className="min-h-screen bg-background flex items-center justify-center">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-foreground mb-4">Health Alerts</h2>
+              <p className="text-text-muted">Health alerts and updates will appear here</p>
+            </div>
+          </div>
+        );
+      case "settings":
+        return (
+          <div className="min-h-screen bg-background">
+            <div className="container mx-auto px-4 py-8">
+              <h1 className="text-3xl font-bold text-foreground mb-8">Settings</h1>
+              <div className="max-w-2xl space-y-8">
+                <div className="bg-card border border-border rounded-2xl p-6">
+                  <h3 className="text-lg font-semibold text-foreground mb-4">Language Preferences</h3>
+                  <LanguageSelector 
+                    selectedLanguage={currentLanguage}
+                    onLanguageChange={setCurrentLanguage}
+                    variant="compact"
+                  />
+                </div>
+                
+                <div className="bg-card border border-border rounded-2xl p-6">
+                  <h3 className="text-lg font-semibold text-foreground mb-4">Appearance</h3>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Dark Mode</p>
+                      <p className="text-sm text-text-muted">Switch between light and dark themes</p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={toggleDarkMode}
+                    >
+                      {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      case "contact":
+        return (
+          <div className="min-h-screen bg-background flex items-center justify-center">
+            <div className="text-center max-w-lg mx-auto px-4">
+              <h2 className="text-2xl font-bold text-foreground mb-4">Contact Health Professional</h2>
+              <p className="text-text-muted mb-8">
+                Connect with qualified health professionals for personalized guidance and support.
+              </p>
+              <div className="space-y-4">
+                <Button variant="hero" size="lg" className="w-full">
+                  Start Chat Consultation
+                </Button>
+                <Button variant="outline" size="lg" className="w-full">
+                  Schedule Phone Call
+                </Button>
+              </div>
+              <p className="text-xs text-text-muted mt-6">
+                🔒 All consultations are confidential and for advisory purposes only
+              </p>
+            </div>
+          </div>
+        );
+      case "disease-detail":
+        return (
+          <div className="min-h-screen bg-background flex items-center justify-center">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-foreground mb-4">Disease Details</h2>
+              <p className="text-text-muted">Detailed information about {pageParams.id} will appear here</p>
+              <Button 
+                variant="outline" 
+                onClick={() => handleNavigate("browse")}
+                className="mt-4"
+              >
+                Back to Browse
+              </Button>
+            </div>
+          </div>
+        );
+      default:
+        return <HomePage onNavigate={handleNavigate} language={currentLanguage} />;
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-background">
+      <div className="flex">
+        <Navigation currentPage={currentPage} onPageChange={handleNavigate} />
+        
+        <main className="flex-1 md:pb-0 pb-20">
+          {renderPage()}
+        </main>
       </div>
     </div>
   );

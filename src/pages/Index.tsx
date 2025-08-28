@@ -135,7 +135,7 @@ const Index = () => {
       <div className="flex">
         <Navigation currentPage={currentPage} onPageChange={handleNavigate} />
         
-        <main className="flex-1 md:pb-0 pb-20">
+        <main className="flex-1 pb-20 md:pb-0">
           {renderPage()}
         </main>
       </div>

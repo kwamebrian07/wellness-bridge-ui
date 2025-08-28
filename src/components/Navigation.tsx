@@ -45,12 +45,7 @@ export const Navigation = ({ currentPage, onPageChange }: NavigationProps) => {
         </nav>
       </div>
 
-      {/* Mobile Header - Simple title only */}
-      <div className="md:hidden bg-card border-b border-border">
-        <div className="flex items-center justify-center p-4">
-          <h1 className="text-lg font-bold text-primary">Health Info</h1>
-        </div>
-      </div>
+      {/* Mobile - No Header */}
 
       {/* Mobile Bottom Navigation */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">

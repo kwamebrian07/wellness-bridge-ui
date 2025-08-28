@@ -1,6 +1,4 @@
-import { useState } from "react";
-import { Home, Search, Bookmark, Bell, Settings, Menu, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Home, Search, Bookmark, Bell, Settings } from "lucide-react";
 
 interface NavigationProps {
   currentPage: string;
@@ -16,8 +14,6 @@ const navItems = [
 ];
 
 export const Navigation = ({ currentPage, onPageChange }: NavigationProps) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
   return (
     <>
       {/* Desktop Sidebar */}
@@ -49,53 +45,17 @@ export const Navigation = ({ currentPage, onPageChange }: NavigationProps) => {
         </nav>
       </div>
 
-      {/* Mobile Header */}
+      {/* Mobile Header - Simple title only */}
       <div className="md:hidden bg-card border-b border-border">
-        <div className="flex items-center justify-between p-4">
+        <div className="flex items-center justify-center p-4">
           <h1 className="text-lg font-bold text-primary">Health Info</h1>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </Button>
         </div>
-        
-        {isMobileMenuOpen && (
-          <div className="border-t border-border bg-muted/30">
-            <nav className="grid grid-cols-2 gap-2 p-4">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = currentPage === item.id;
-                
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      onPageChange(item.id);
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className={`flex flex-col items-center gap-2 p-4 rounded-2xl transition-smooth ${
-                      isActive
-                        ? "bg-primary text-primary-foreground shadow-soft"
-                        : "text-text-muted hover:bg-muted hover:text-foreground"
-                    }`}
-                  >
-                    <Icon className="w-5 h-5" />
-                    <span className="text-sm font-medium">{item.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
-        )}
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">
         <nav className="flex">
-          {navItems.slice(0, 4).map((item) => {
+          {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentPage === item.id;
             
@@ -114,17 +74,6 @@ export const Navigation = ({ currentPage, onPageChange }: NavigationProps) => {
               </button>
             );
           })}
-          <button
-            onClick={() => onPageChange("settings")}
-            className={`flex-1 flex flex-col items-center gap-1 py-3 transition-smooth ${
-              currentPage === "settings"
-                ? "text-primary"
-                : "text-text-muted"
-            }`}
-          >
-            <Settings className="w-5 h-5" />
-            <span className="text-xs font-medium">Settings</span>
-          </button>
         </nav>
       </div>
     </>
